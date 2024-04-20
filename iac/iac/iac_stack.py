@@ -58,63 +58,9 @@ class IacStack(Stack):
             ),
         )
 
-        password = self.stack_name + "UserPassword7@"
-
-        user = iam.User(self, self.stack_name + "User",
-                        user_name=self.stack_name + "User",
-                        password_reset_required=True,
-                        password=SecretValue.unsafe_plain_text(password)
-                        )
-
-        policy = iam.Policy(self, "Policy", statements=[
-            iam.PolicyStatement(
-                actions=["lambda:*"],
-                resources=[lambda_fn.function_arn]
-            )
-        ])
-
-        policy.add_statements(
-            iam.PolicyStatement(
-                actions=["logs:*"],
-                resources=[
-                    f"arn:aws:logs:{self.region}:{self.aws_account_id}:log-group:/aws/lambda/{lambda_fn.function_name}:*"
-                ],
-            )
-        )
-
-        policy.attach_to_user(user)
-
-        user.add_managed_policy(
-            iam.ManagedPolicy.from_aws_managed_policy_name("IAMUserChangePassword")
-        )
-
-        
-        alarm = lambda_fn.metric_invocations(
-            period=Duration.hours(6),
-        ).create_alarm(
-            self, self.stack_name +"LambdaAlarm",
-            threshold=5000,
-            evaluation_periods=1,
-            comparison_operator=ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-        ) 
-        topic = Topic.from_topic_arn(self, self.stack_name + "Topic", f"arn:aws:sns:{self.region}:{self.aws_account_id}:sns-simplefastapi")
-        sns_action = SnsAction(topic)
-
-        alarm.add_alarm_action(sns_action)
-
         CfnOutput(self, self.stack_name + "Url",
                   value=lambda_url.url,
                   export_name= self.stack_name + 'UrlValue')    
-
-        CfnOutput(self, self.stack_name + "UserOutput",
-                  value=user.user_name,
-                  export_name= self.stack_name + 'UserValue'
-                  )
-
-        CfnOutput(self, self.stack_name + "FirstTimeUserPassword",
-                  value=password,
-                  export_name= self.stack_name + 'FirstTimeUserPasswordValue'
-                  )    
         
         CfnOutput(self, self.stack_name + "LambdaConsole",
                     value="https://" + self.region + ".console.aws.amazon.com/lambda/home?region=" + self.region + "#/functions/" + lambda_fn.function_name + "?tab=code",
