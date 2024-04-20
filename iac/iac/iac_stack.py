@@ -35,6 +35,7 @@ class IacStack(Stack):
             "SimpleFastAPILambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("../src"),
+            memory_size=512,
             environment={
                 "STAGE":"TEST",
                 "AUTH_DEV_SYSTEM_USERPOOL_ARN_DEV": userpool_arn_dev,
@@ -58,8 +59,6 @@ class IacStack(Stack):
             max_age=Duration.seconds(5),
             ),
         )
-
-        lambda_fn.add_to_role_policy(cognito_policy)
 
         CfnOutput(self, self.stack_name + "Url",
                   value=lambda_url.url,
