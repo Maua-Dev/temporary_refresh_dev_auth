@@ -24,7 +24,6 @@ class IacStack(Stack):
         userpool_arn_dev  = os.environ.get("AUTH_DEV_SYSTEM_USERPOOL_ARN_DEV")
         userpool_arn_prod = os.environ.get("AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD")
 
-
         lambda_fn = _lambda.Function(
             self,
             "SimpleFastAPILambda",
@@ -38,6 +37,15 @@ class IacStack(Stack):
             handler="app.main.handler",
             timeout=Duration.seconds(15),
         )
+
+        # add a ListUserPoolClients policy to the lambda function
+        lambda_fn.add_to_role_policy(
+            statement=iam.PolicyStatement(
+                actions=["cognito-idp:ListUserPoolClients", ],
+                resources=[userpool_arn_dev, userpool_arn_prod]
+            )
+        )
+
 
         lambda_url = lambda_fn.add_function_url(
             auth_type=_lambda.FunctionUrlAuthType.NONE,
