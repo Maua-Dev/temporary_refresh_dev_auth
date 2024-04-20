@@ -41,7 +41,7 @@ class IacStack(Stack):
                 "AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD": userpool_arn_prod
                          },
             handler="app.main.handler",
-            initialPolicy=[
+            initial_policy=[
                 cognito_policy
             ],
 
