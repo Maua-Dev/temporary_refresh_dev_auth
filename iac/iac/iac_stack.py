@@ -38,17 +38,6 @@ class IacStack(Stack):
             timeout=Duration.seconds(15),
         )
 
-        lambda_fn.add_to_role_policy(
-            statement=iam.PolicyStatement(
-                effect=iam.Effect.ALLOW,
-                actions=["cognito-idp:InitiateAuth",
-                         "cognito-idp:ListUserPoolClients"],
-                resources=[userpool_arn_dev, userpool_arn_prod]
-            )
-        )
-
-
-
         lambda_url = lambda_fn.add_function_url(
             auth_type=_lambda.FunctionUrlAuthType.NONE,
             cors=_lambda.FunctionUrlCorsOptions(
@@ -59,6 +48,15 @@ class IacStack(Stack):
             max_age=Duration.seconds(5),
             ),
         )
+
+        cognito_policy = iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["cognito-idp:InitiateAuth",
+                     "cognito-idp:ListUserPoolClients"],
+            resources=[userpool_arn_dev, userpool_arn_prod]
+        )
+
+        lambda_fn.add_to_role_policy(cognito_policy)
 
         CfnOutput(self, self.stack_name + "Url",
                   value=lambda_url.url,
