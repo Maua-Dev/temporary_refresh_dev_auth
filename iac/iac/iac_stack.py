@@ -38,13 +38,15 @@ class IacStack(Stack):
             timeout=Duration.seconds(15),
         )
 
-        # add a ListUserPoolClients policy to the lambda function
         lambda_fn.add_to_role_policy(
             statement=iam.PolicyStatement(
-                actions=["cognito-idp:ListUserPoolClients", ],
+                effect=iam.Effect.ALLOW,
+                actions=["cognito-idp:InitiateAuth",
+                         "cognito-idp:ListUserPoolClients"],
                 resources=[userpool_arn_dev, userpool_arn_prod]
             )
         )
+
 
 
         lambda_url = lambda_fn.add_function_url(
