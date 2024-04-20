@@ -18,11 +18,17 @@ class IacStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
         self.project_name = os.environ.get("PROJECT_NAME")
         self.aws_account_id = os.environ.get("AWS_ACCOUNT_ID")
         userpool_arn_dev  = os.environ.get("AUTH_DEV_SYSTEM_USERPOOL_ARN_DEV")
         userpool_arn_prod = os.environ.get("AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD")
+
+        cognito_policy = iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["cognito-idp:InitiateAuth",
+                     "cognito-idp:ListUserPoolClients"],
+            resources=[userpool_arn_dev, userpool_arn_prod]
+        )
 
         lambda_fn = _lambda.Function(
             self,
@@ -35,6 +41,10 @@ class IacStack(Stack):
                 "AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD": userpool_arn_prod
                          },
             handler="app.main.handler",
+            initialPolicy=[
+                cognito_policy
+            ],
+
             timeout=Duration.seconds(15),
         )
 
@@ -47,13 +57,6 @@ class IacStack(Stack):
             allowed_methods=[_lambda.HttpMethod.ALL],
             max_age=Duration.seconds(5),
             ),
-        )
-
-        cognito_policy = iam.PolicyStatement(
-            effect=iam.Effect.ALLOW,
-            actions=["cognito-idp:InitiateAuth",
-                     "cognito-idp:ListUserPoolClients"],
-            resources=[userpool_arn_dev, userpool_arn_prod]
         )
 
         lambda_fn.add_to_role_policy(cognito_policy)

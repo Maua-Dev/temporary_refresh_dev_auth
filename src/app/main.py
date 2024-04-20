@@ -32,7 +32,7 @@ def refresh_token(request: dict):
 
     # get client id based on userpool arn
     client = boto3.client("cognito-idp")
-    response = client.list_user_pool_clients(UserPoolId=userpool_arn)
+    response = client.list_user_pool_clients(UserPoolId=userpool_arn.split("/")[1])
     client_id = response["UserPoolClients"][0]["ClientId"]
     
     try:
