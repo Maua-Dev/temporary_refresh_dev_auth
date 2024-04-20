@@ -21,13 +21,20 @@ class IacStack(Stack):
 
         self.project_name = os.environ.get("PROJECT_NAME")
         self.aws_account_id = os.environ.get("AWS_ACCOUNT_ID")
+        userpool_arn_dev  = os.environ.get("AUTH_DEV_SYSTEM_USERPOOL_ARN_DEV")
+        userpool_arn_prod = os.environ.get("AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD")
+
 
         lambda_fn = _lambda.Function(
             self,
             "SimpleFastAPILambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset("../src"),
-            environment={"STAGE":"TEST"},
+            environment={
+                "STAGE":"TEST",
+                "AUTH_DEV_SYSTEM_USERPOOL_ARN_DEV": userpool_arn_dev,
+                "AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD": userpool_arn_prod
+                         },
             handler="app.main.handler",
             timeout=Duration.seconds(15),
         )
