@@ -3,8 +3,7 @@ from mangum import Mangum
 import boto3
 import os
 from botocore.exceptions import ClientError
-from src.app.errors.controller_errors import WrongTypeParameters, MissingParameters
-from src.app.errors.entity_errors import ParamNotValidated
+from errors import MissingParameters, WrongTypeParameters, ParamNotValidated
 
 app = FastAPI()
 
@@ -37,8 +36,6 @@ def refresh_token(request: dict):
 
         elif stage == "prod":
             userpool_arn = os.getenv("AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD")
-
-        print(f'userpool_arn: {userpool_arn}')
         
         # get client id based on userpool arn
         client = boto3.client("cognito-idp")
@@ -62,7 +59,6 @@ def refresh_token(request: dict):
         if errorCode == 'NotAuthorizedException':
             raise HTTPException(status_code=401, detail="Invalid token")
         else:
-            print(f'error: {e}')
             raise HTTPException(status_code=500, detail="Internal server error")
     except MissingParameters as e:
         raise HTTPException(status_code=400, detail=str(e.message))
