@@ -38,7 +38,8 @@ def refresh_token(request: dict):
         elif stage == "prod":
             userpool_arn = os.getenv("AUTH_DEV_SYSTEM_USERPOOL_ARN_PROD")
 
-
+        print(f'userpool_arn: {userpool_arn}')
+        
         # get client id based on userpool arn
         client = boto3.client("cognito-idp")
         response = client.list_user_pool_clients(UserPoolId=userpool_arn.split("/")[1])
