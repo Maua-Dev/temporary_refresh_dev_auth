@@ -61,6 +61,7 @@ def refresh_token(request: dict):
         if errorCode == 'NotAuthorizedException':
             raise HTTPException(status_code=401, detail="Invalid token")
         else:
+            print(f'error: {e}')
             raise HTTPException(status_code=500, detail="Internal server error")
     except MissingParameters as e:
         raise HTTPException(status_code=400, detail=str(e.message))
