@@ -24,6 +24,11 @@ def refresh_token(request: dict):
         token = request.get("refresh_token")
         stage = request.get("stage")
         
+        if len(token) == 0:
+            raise ParamNotValidated("refresh_token", "refresh_token can't be empty")
+        if len(stage) == 0:
+            raise ParamNotValidated("stage", "stage can't be empty")
+        
         if stage not in ["dev", "prod"]:
             raise ParamNotValidated("stage", "stage must be 'dev' or 'prod'")
         
