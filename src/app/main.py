@@ -3,7 +3,7 @@ from mangum import Mangum
 import boto3
 import os
 from botocore.exceptions import ClientError
-from ..app.errors import MissingParameters, WrongTypeParameters, ParamNotValidated
+from .errors import MissingParameters, WrongTypeParameters, ParamNotValidated
 
 app = FastAPI()
 
