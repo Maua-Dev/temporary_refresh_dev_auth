@@ -34,7 +34,7 @@ class IacStack(Stack):
             self,
             "SimpleFastAPILambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
-            code=_lambda.Code.from_asset("../src"),
+            code=_lambda.Code.from_asset("../..src"),
             memory_size=512,
             environment={
                 "STAGE":"TEST",
